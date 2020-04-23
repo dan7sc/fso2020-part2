@@ -6,10 +6,14 @@ const App = () => {
     ])
     const [ newName, setNewName ] = useState('')
 
-    const addContact = (event) => {
+    const addPerson = (event) => {
         event.preventDefault()
         const newContact = {
             name: newName
+        }
+        if (persons.map(person => person.name === newContact.name).includes(true)) {
+            setNewName('')
+            return alert(`${newContact.name} is already added to phonebook`)
         }
         setPersons(persons.concat(newContact))
         setNewName('')
@@ -22,7 +26,7 @@ const App = () => {
     return (
         <div>
           <h2>Phonebook</h2>
-          <form onSubmit={addContact}>
+          <form onSubmit={addPerson}>
             <div>
               name: <input
                       value={newName}
