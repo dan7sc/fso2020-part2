@@ -2,11 +2,11 @@ import React from 'react'
 import PersonDetails from './PersonDetails'
 
 const Persons = (props) => {
-    const {personsToShow} = props
+    const {persons} = props
 
     return (
         <div>
-          {personsToShow.map(person => <PersonDetails key={person.name} person={person} />)}
+          {persons.map(person => <PersonDetails key={person.name} person={person} />)}
         </div>
     )
 }
