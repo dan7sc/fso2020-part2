@@ -32,10 +32,11 @@ const Content = (props) => {
 
 const Total = (props) => {
     const {parts} = props
+    const total = parts.reduce((sum, part) => sum + part.exercises, 0)
 
     return (
         <div>
-          <b>total of {parts[0].exercises + parts[1].exercises + parts[2].exercises + parts[3].exercises} exercises</b>
+          <b>total of {total} exercises</b>
         </div>
     )
 }
