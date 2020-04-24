@@ -19,25 +19,52 @@ const App = () => {
             })
     }, [])
 
+    const existPersonName = (name) => persons.map(person => person.name === name).includes(true)
+
+    const existPersonNumber = (number) => persons.map(person => person.number === number).includes(true)
+
+    const getPersonId = (name) => persons.filter(person => person.name === name)[0].id
+
+    const updatePerson = (newContact) => {
+        const id = getPersonId(newContact.name)
+        personService
+            .update(id, newContact)
+            .then(returnedPerson => {
+                const updatedList = persons.map(person => person.id !== returnedPerson.id ? person : returnedPerson)
+                setPersons(updatedList)
+                setPersonsToShow(updatedList)
+                setNewName('')
+                setNewNumber('')
+            })
+    }
+
+    const createPerson = (newContact) => {
+        personService
+            .create(newContact)
+            .then(returnedPerson => {
+                setPersons(persons.concat(returnedPerson))
+                setPersonsToShow(persons.concat(returnedPerson))
+            })
+        setNewName('')
+        setNewNumber('')
+    }
+
     const addPerson = (event) => {
         event.preventDefault()
         const newContact = {
             name: newName,
             number: newNumber
         }
-        if (persons.map(person => person.name === newContact.name).includes(true)) {
-            setNewName('')
-            setNewNumber('')
-            return alert(`${newContact.name} is already added to phonebook`)
+        if (existPersonName(newContact.name)) {
+            const alertMessage = `${newContact.name} is already added to phonebook`
+            const confirmMessage = `${newContact.name} is already added to phonebook, replace the old number with a new one?`
+            if (existPersonNumber(newContact.number)) {
+                return alert(alertMessage)
+            } else {
+                if (window.confirm(confirmMessage)) return updatePerson(newContact)
+            }
         }
-        personService
-            .create(newContact)
-            .then(returnedPerson => {
-                setPersons(persons.concat(returnedPerson))
-                setPersonsToShow(persons.concat(returnedPerson))
-                setNewName('')
-                setNewNumber('')
-            })
+        createPerson(newContact)
     }
 
     const handleNameChange = (event) => {
