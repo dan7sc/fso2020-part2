@@ -1,94 +1,73 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-
-const Countries = (props) => {
-    const {countries, handleClick} = props
-
-    return (
-        countries.map(country => {
-            return (
-                <div key={country.name}>
-                  <span>{country.name}</span>
-                  <button onClick={() => handleClick(country)}>show</button>
-                </div>
-            )
-        })
-    )
-}
-
-const CountryDetails = (props) => {
-    const {country} = props
-
-    return (
-        <div>
-          <h1>{country.name}</h1>
-          <div>capital {country.capital}</div>
-          <div>population {country.population}</div>
-          <h2>languages</h2>
-          <ul>
-            {country.languages.map(language => {
-                return <li key={language.name}>{language.name}</li>})
-            }
-          </ul>
-          <img alt={country.flag} src={country.flag} height='150px' width='150px'/>
-        </div>
-    )
-}
-
-const Message = (props) => {
-    const {text} = props
-
-    return <div>{text}</div>
-}
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 const App = () => {
-    const [ countries, setCountries ] = useState([])
-    const [ filtered, setFiltered ] = useState([])
+    const [ persons, setPersons ] = useState([])
+    const [ newName, setNewName ] = useState('')
+    const [ newNumber, setNewNumber ] = useState('')
+    const [ personsToShow, setPersonsToShow ] = useState(persons)
 
     useEffect(() => {
-        const receivedCountries = []
         axios
-            .get('https://restcountries.eu/rest/v2/all')
+            .get('http://localhost:3001/persons')
             .then(response => {
-                response.data.forEach(country => {
-                    receivedCountries.push(country)
-                })
+                setPersons(response.data)
+                setPersonsToShow(response.data)
             })
-        setCountries(receivedCountries)
-        setFiltered(receivedCountries)
     }, [])
+
+    const addPerson = (event) => {
+        event.preventDefault()
+        const newContact = {
+            name: newName,
+            number: newNumber
+        }
+        if (persons.map(person => person.name === newContact.name).includes(true)) {
+            setNewName('')
+            setNewNumber('')
+            return alert(`${newContact.name} is already added to phonebook`)
+        }
+        axios
+            .post('http://localhost:3001/persons', newContact)
+            .then(response => {
+                setPersons(persons.concat(response.data))
+                setPersonsToShow(persons.concat(response.data))
+                setNewName('')
+                setNewNumber('')
+            })
+    }
+
+    const handleNameChange = (event) => {
+        setNewName(event.target.value)
+    }
+
+    const handleNumberChange = (event) => {
+        setNewNumber(event.target.value)
+    }
 
     const handleFilterChange = (event) => {
         const filter = event.target.value
-        const filtered = countries.filter(country => country.name.toLowerCase().includes(filter))
-        setFiltered(filtered)
-    }
-
-    const handleClick = (country) => {
-        setFiltered([country])
+        const personsToFilter = persons.filter(person => person.name.toLowerCase().includes(filter))
+        setPersonsToShow(personsToFilter)
     }
 
     return (
         <div>
-          <input onChange={handleFilterChange} />
-          <div>
-            {filtered.length === countries.length ?
-             '' :
-             filtered.length > 10 ?
-             <Message
-               text='Too many matches, specify another filter'
-             />:
-             filtered.length > 1 ?
-             <Countries
-               countries={filtered}
-               handleClick={handleClick}
-             /> :
-             filtered.map(country => <CountryDetails
-                                       key={country.name}
-                                       country={country}
-                                     />)
-            }
-          </div>
+          <h2>Phonebook</h2>
+          <Filter handleFilterChange={handleFilterChange} />
+          <h3>add a new</h3>
+          <PersonForm
+            newName={newName}
+            newNumber={newNumber}
+            addPerson={addPerson}
+            handleNameChange={handleNameChange}
+            handleNumberChange={handleNumberChange}
+          />
+          <h3>Numbers</h3>
+          <Persons persons={personsToShow} />
         </div>
     )
 }
