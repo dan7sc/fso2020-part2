@@ -30,7 +30,7 @@ const CountryDetails = (props) => {
                 return <li key={language.name}>{language.name}</li>})
             }
           </ul>
-          <img src={country.flag} height='150px' width='150px'/>
+          <img alt={country.flag} src={country.flag} height='150px' width='150px'/>
         </div>
     )
 }
@@ -72,13 +72,21 @@ const App = () => {
         <div>
           <input onChange={handleFilterChange} />
           <div>
-            {filtered.length > 10 ?
-             <Message text='Too many matches, specify another filter' />:
+            {filtered.length === countries.length ?
+             '' :
+             filtered.length > 10 ?
+             <Message
+               text='Too many matches, specify another filter'
+             />:
              filtered.length > 1 ?
-             <Countries countries={filtered} handleClick={handleClick} /> :
-             filtered.map(country => {
-                 return <CountryDetails key={country.name} country={country} />
-             })
+             <Countries
+               countries={filtered}
+               handleClick={handleClick}
+             /> :
+             filtered.map(country => <CountryDetails
+                                       key={country.name}
+                                       country={country}
+                                     />)
             }
           </div>
         </div>
