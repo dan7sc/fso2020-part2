@@ -1,10 +1,13 @@
 import React from 'react'
 
 const PersonDetails = (props) => {
-    const {person} = props
+    const {person, handlePersonDelete} = props
 
     return (
-        <div>{person.name} {person.number}</div>
+        <div>
+          <span>{person.name} {person.number} </span>
+          <button onClick={() => handlePersonDelete(person.id)}>delete</button>
+        </div>
     )
 }
 
