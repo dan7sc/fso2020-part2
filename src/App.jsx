@@ -3,14 +3,16 @@ import personService from './services/person'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import Notification from './components/Notification'
+import SuccessNotification from './components/SuccessNotification'
+import ErrorNotification from './components/ErrorNotification'
 
 const App = () => {
     const [ persons, setPersons ] = useState([])
     const [ newName, setNewName ] = useState('')
     const [ newNumber, setNewNumber ] = useState('')
     const [ personsToShow, setPersonsToShow ] = useState(persons)
-    const [ confirmMessage, setConfirmMessage ] = useState(null)
+    const [ successMessage, setSuccessMessage ] = useState(null)
+    const [ errorMessage, setErrorMessage ] = useState(null)
 
     useEffect(() => {
         personService
@@ -35,7 +37,10 @@ const App = () => {
                 const updatedList = persons.map(person => person.id !== returnedPerson.id ? person : returnedPerson)
                 setPersons(updatedList)
                 setPersonsToShow(updatedList)
-                showNotification(`Changed number to ${returnedPerson.number}`)
+                showNotification(`Changed number to ${returnedPerson.number}`, setSuccessMessage)
+            })
+            .catch(() => {
+                showNotification(`Information of ${newContact.name} has already been removed from server`, setErrorMessage)
             })
         setNewName('')
         setNewNumber('')
@@ -47,16 +52,16 @@ const App = () => {
             .then(returnedPerson => {
                 setPersons(persons.concat(returnedPerson))
                 setPersonsToShow(persons.concat(returnedPerson))
-                showNotification(`Added ${returnedPerson.name}`)
+                showNotification(`Added ${returnedPerson.name}`, setSuccessMessage)
             })
         setNewName('')
         setNewNumber('')
     }
 
-    const showNotification = (message) => {
-        setConfirmMessage(message)
+    const showNotification = (message, callback) => {
+        callback(message)
         setTimeout(() => {
-            setConfirmMessage(null)
+            callback(null)
         }, 3000)
     }
 
@@ -71,9 +76,8 @@ const App = () => {
             const confirmMessage = `${newContact.name} is already added to phonebook, replace the old number with a new one?`
             if (existPersonNumber(newContact.number)) {
                 return alert(alertMessage)
-            } else {
-                if (window.confirm(confirmMessage)) return updatePerson(newContact)
             }
+            if (window.confirm(confirmMessage)) return updatePerson(newContact)
         }
         createPerson(newContact)
     }
@@ -106,7 +110,8 @@ const App = () => {
     return (
         <div>
           <h2>Phonebook</h2>
-          <Notification message={confirmMessage} />
+          <SuccessNotification classesName='success' message={successMessage} />
+          <ErrorNotification classesName='error' message={errorMessage} />
           <Filter handleFilterChange={handleFilterChange} />
           <h3>add a new</h3>
           <PersonForm

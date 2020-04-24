@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Notification = (props) => {
+const ErrorNotification = (props) => {
     const {message} = props
 
     if (message === null) {
@@ -8,10 +8,10 @@ const Notification = (props) => {
     }
 
     return (
-        <div className='confirm'>
+        <div className='error'>
           {message}
         </div>
     )
 }
 
-export default Notification
+export default ErrorNotification
