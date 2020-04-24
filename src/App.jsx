@@ -2,10 +2,17 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
 const Countries = (props) => {
-    const {countries} = props
+    const {countries, handleClick} = props
 
     return (
-        countries.map(country => <div key={country.name}>{country.name}</div>)
+        countries.map(country => {
+            return (
+                <div key={country.name}>
+                  <span>{country.name}</span>
+                  <button onClick={() => handleClick(country)}>show</button>
+                </div>
+            )
+        })
     )
 }
 
@@ -26,6 +33,12 @@ const CountryDetails = (props) => {
           <img src={country.flag} height='150px' width='150px'/>
         </div>
     )
+}
+
+const Message = (props) => {
+    const {text} = props
+
+    return <div>{text}</div>
 }
 
 const App = () => {
@@ -51,14 +64,18 @@ const App = () => {
         setFiltered(filtered)
     }
 
+    const handleClick = (country) => {
+        setFiltered([country])
+    }
+
     return (
         <div>
           <input onChange={handleFilterChange} />
           <div>
             {filtered.length > 10 ?
-             'Too many matches, specify another filter' :
+             <Message text='Too many matches, specify another filter' />:
              filtered.length > 1 ?
-             <Countries countries={filtered} /> :
+             <Countries countries={filtered} handleClick={handleClick} /> :
              filtered.map(country => {
                  return <CountryDetails key={country.name} country={country} />
              })
