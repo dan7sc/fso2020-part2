@@ -21,6 +21,9 @@ const App = () => {
                 setPersons(initialPersons)
                 setPersonsToShow(initialPersons)
             })
+            .catch(() => {
+                showNotification(`Error in getting data`, setErrorMessage)
+            })
     }, [])
 
     const existPersonName = (name) => persons.map(person => person.name === name).includes(true)
@@ -39,9 +42,6 @@ const App = () => {
                 setPersonsToShow(updatedList)
                 showNotification(`Changed number to ${returnedPerson.number}`, setSuccessMessage)
             })
-            .catch(() => {
-                showNotification(`Information of ${newContact.name} has already been removed from server`, setErrorMessage)
-            })
         setNewName('')
         setNewNumber('')
     }
@@ -53,6 +53,10 @@ const App = () => {
                 setPersons(persons.concat(returnedPerson))
                 setPersonsToShow(persons.concat(returnedPerson))
                 showNotification(`Added ${returnedPerson.name}`, setSuccessMessage)
+            })
+            .catch(e => {
+                const error = e.response.data.error
+                showNotification(error, setErrorMessage)
             })
         setNewName('')
         setNewNumber('')
